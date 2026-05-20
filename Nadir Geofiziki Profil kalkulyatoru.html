@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMC Geofiziki Profil Kalkulyatoru</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome İkonları -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Başlıq və Korporativ Loqo Bölməsi -->
+        <header class="mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 border-b border-slate-800 pb-6">
+            <div class="flex flex-col md:flex-row items-start md:items-center gap-5">
+                <!-- Loqo və Müəllif məlumatı -->
+                <div class="flex flex-col items-start gap-1">
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 shadow-inner flex items-center justify-center max-w-[280px] md:max-w-[320px]">
+                        <!-- Cari qovluqdakı yüklənmiş loqo şəkli -->
+                        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEigJYtgQ4EoDiZdft2n7-VPlHCFsZIggLuLZyfupp2D4TaaabYRs54of1JX3oKH8C3PlEbCBNxPN84ihYWjJPLvoFLmZ-_7VOcnr07P0rOodM13bUYr-xWM46CSLY2SfQ/s111/Nadir+2019-2.jpg" class="h-auto w-full object-contain" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=400&q=80'; this.style.opacity='0.15';">
+                    </div>
+                    <!-- Müəllif və Bölmə mətni -->
+                    <div class="px-1 mt-1">
+                                  <span class="text-[10px] text-slate-400 block mt-0.5">Müəllif: <strong class="text-xs font-semibold text-indigo-400 block tracking-wide">Nadir Abbaszadə</span>
+                    </div>
+                </div>
+
+                <div class="h-12 w-px bg-slate-800 hidden md:block"></div>
+
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-white flex items-center gap-2">
+                        Geofiziki Profil Kalkulyatoru
+                    </h1>
+                    <p class="text-slate-400 text-sm mt-1">İstənilən UTM zonası və azimut üzrə poliqon daxili profillərin və piketlərin avtomatlaşdırılmış hesablama sistemi</p>
+                </div>
+            </div>
+            
+            <!-- Tab menyusu -->
+            <div class="flex gap-2 w-full lg:w-auto self-end lg:self-center">
+                <button onclick="switchTab('calculator')" id="tab-btn-calculator" class="flex-1 md:flex-none px-5 py-2.5 rounded-lg font-medium text-sm transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">
+                    <i class="fa-solid fa-calculator mr-2"></i>Kalkulyator
+                </button>
+                <button onclick="switchTab('guide')" id="tab-btn-guide" class="flex-1 md:flex-none px-5 py-2.5 rounded-lg font-medium text-sm transition-all bg-slate-800 text-slate-300 hover:bg-slate-700">
+                    <i class="fa-solid fa-file-excel mr-2"></i>Excel Metodikası
+                </button>
+            </div>
+        </header>
+
+        <!-- KALKULYATOR TABI -->
+        <div id="tab-calculator" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Parametrlər və Girişlər -->
+                <div class="lg:col-span-5 space-y-6">
+                    <!-- Sahə Parametrləri -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl">
+                        <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-indigo-400"></i> Sahə Parametrləri
+                        </h2>
+                        
+                        <div class="space-y-4">
+                            <!-- UTM Zona və Yarımkürə sualları -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">UTM Longitude Zone</label>
+                                    <input type="number" id="utm-zone" min="1" max="60" value="38" onchange="updateUTMLabels()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">UTM Hemisphere</label>
+                                    <select id="utm-hemisphere" onchange="updateUTMLabels()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition-all">
+                                        <option value="N" selected>Şimal (N)</option>
+                                        <option value="S">Cənub (S)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Künc Sayı Sualı -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Poliqonun neçə guşəsi (küncü) var?</label>
+                                <input type="number" id="corner-count" min="3" max="20" value="4" onchange="updateCornerInputs()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition-all">
+                            </div>
+
+                            <!-- Addım məsafələri sualları -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Piket addımı (metrlə)</label>
+                                    <input type="number" id="point-spacing" min="1" value="5" oninput="calculateProfiles()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Profil məsafəsi (metrlə)</label>
+                                    <input type="number" id="profile-spacing" min="1" value="20" oninput="calculateProfiles()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition-all">
+                                </div>
+                            </div>
+
+                            <!-- Azimut Sualı -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex justify-between">
+                                    <span>Profillərin hansı azimutla olması (Dərəcə)</span>
+                                    <span id="azimuth-val" class="text-indigo-400 font-bold">45°</span>
+                                </label>
+                                <input type="range" id="azimuth" min="0" max="360" value="45" oninput="updateAzimuthVal(this.value)" class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                                <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                                    <span>0° (Şimal)</span>
+                                    <span>90° (Şərq)</span>
+                                    <span>180° (Cənub)</span>
+                                    <span>270° (Qərb)</span>
+                                    <span>360°</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Künclərin koordinatları -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-draw-polygon text-indigo-400"></i> Künc Koordinatları (<span class="utm-label">UTM38N</span>)
+                            </h2>
+                            <button onclick="loadSampleCoordinates()" class="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-300 px-2.5 py-1 rounded transition-all">
+                                Nümunə Yüklə
+                            </button>
+                        </div>
+                        
+                        <div class="max-h-[300px] overflow-y-auto pr-1 space-y-2" id="corners-container">
+                            <!-- JS ilə doldurulacaq -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- İnteraktiv Canlı Xəritə -->
+                <div class="lg:col-span-7 flex flex-col">
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl flex-grow flex flex-col min-h-[450px]">
+                        <h2 class="text-lg font-semibold text-white mb-4 flex items-center justify-between">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-map text-indigo-400"></i> İnteraktiv Sahə Planı</span>
+                            <span class="text-xs bg-indigo-950 text-indigo-400 border border-indigo-800 px-2 py-0.5 rounded-full uppercase font-semibold">Canlı Önizləmə</span>
+                        </h2>
+                        
+                        <div class="relative bg-slate-950 border border-slate-850 rounded-lg flex-grow flex items-center justify-center p-4 min-h-[350px]">
+                            <canvas id="visualizer-canvas" class="w-full h-full object-contain max-h-[500px]"></canvas>
+                        </div>
+                        
+                        <div class="flex flex-wrap justify-between gap-3 text-xs text-slate-400 mt-3">
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-indigo-500 rounded-full inline-block"></span> Piketlər</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-emerald-500 inline-block"></span> Poliqon Sərhədləri</span>
+                            <span id="piket-counter" class="font-bold text-white ml-auto">Cəmi: 0 nöqtə</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Hesablanmış Nöqtələr Cədvəli -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <h2 class="text-xl font-semibold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-list-ol text-indigo-400"></i> Hesablanmış Profil və Piket Siyahısı
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">Siyahıda yalnız poliqon daxilinə düşən nöqtələr saxlanılmışdır (Ray-Casting süzgəci)</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+                        <button onclick="exportCSV()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/15">
+                            <i class="fa-solid fa-file-csv text-base"></i> EXCEL / CSV YÜKLƏ
+                        </button>
+                        <button onclick="exportKML()" class="w-full sm:w-auto bg-sky-600 hover:bg-sky-500 text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-sky-600/15">
+                            <i class="fa-solid fa-earth-americas text-base"></i> GOOGLE EARTH (KMZ / KML) YÜKLƏ
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-lg border border-slate-800">
+                    <table class="w-full text-left text-sm text-slate-300">
+                        <thead class="bg-slate-950 text-xs font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-800">
+                            <tr>
+                                <th class="px-6 py-3.5">Ardıcıl №</th>
+                                <th class="px-6 py-3.5 text-indigo-400">Profil №</th>
+                                <th class="px-6 py-3.5 text-indigo-400">Piket №</th>
+                                <th class="px-6 py-3.5">Fırladılmış X' (m)</th>
+                                <th class="px-6 py-3.5">Fırladılmış Y' (m)</th>
+                                <th class="px-6 py-3.5 text-emerald-400"><span class="utm-label">UTM38N</span> X</th>
+                                <th class="px-6 py-3.5 text-emerald-400"><span class="utm-label">UTM38N</span> Y</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-tbody" class="divide-y divide-slate-800">
+                            <tr>
+                                <td colspan="7" class="px-6 py-10 text-center text-slate-500">Koordinatları daxil edin...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXCEL METODİKASI TABI -->
+        <div id="tab-guide" class="space-y-6 hidden">
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl space-y-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-file-excel text-emerald-500"></i> Excel-də Formul Şəbəkəsinin Qurulması
+                    </h2>
+                    <p class="text-slate-400 mt-1">Bu sistemin eyni riyazi məntiqini Excel vərəqinizdə necə tətbiq edə biləcəyiniz aşağıdakı cədvəldə göstərilmişdir:</p>
+                </div>
+
+                <div class="border border-slate-800 rounded-xl overflow-hidden bg-slate-950">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300 font-mono">
+                            <thead>
+                                <tr class="bg-slate-900 border-b border-slate-800 text-slate-400 text-center">
+                                    <th class="border-r border-slate-800 px-3 py-1 bg-slate-950 w-10"></th>
+                                    <th class="border-r border-slate-800 px-4 py-2">A</th>
+                                    <th class="border-r border-slate-800 px-4 py-2">B</th>
+                                    <th class="border-r border-slate-800 px-4 py-2">C</th>
+                                    <th class="px-4 py-2 text-left">Düstur və İzahı</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-850">
+                                <tr>
+                                    <td class="bg-slate-900 text-slate-500 text-center border-r border-slate-800 py-2.5">1</td>
+                                    <td class="border-r border-slate-800 px-4 text-slate-400">Piket addımı (m):</td>
+                                    <td class="border-r border-slate-800 px-4 font-bold text-indigo-400 bg-indigo-950/20">5</td>
+                                    <td class="border-r border-slate-800 px-4"></td>
+                                    <td class="px-4 text-slate-500 italic">Piketlərin metr üzrə ara məsafəsi</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-slate-900 text-slate-500 text-center border-r border-slate-800 py-2.5">2</td>
+                                    <td class="border-r border-slate-800 px-4 text-slate-400">Profil məsafəsi (m):</td>
+                                    <td class="border-r border-slate-800 px-4 font-bold text-indigo-400 bg-indigo-950/20">20</td>
+                                    <td class="border-r border-slate-800 px-4"></td>
+                                    <td class="px-4 text-slate-500 italic">Profillərin bir-birindən olan məsafəsi</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-slate-900 text-slate-500 text-center border-r border-slate-800 py-2.5">3</td>
+                                    <td class="border-r border-slate-800 px-4 text-slate-400">Profil Azimutu:</td>
+                                    <td class="border-r border-slate-800 px-4 font-bold text-indigo-400 bg-indigo-950/20">45</td>
+                                    <td class="border-r border-slate-800 px-4"></td>
+                                    <td class="px-4 text-slate-500 italic">İstənilən azimut bucağı (dərəcə)</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-slate-900 text-slate-500 text-center border-r border-slate-800 py-2.5">4</td>
+                                    <td class="border-r border-slate-800 px-4 text-slate-400">Azimut (Radianla):</td>
+                                    <td class="border-r border-slate-800 px-4 text-emerald-400 bg-slate-900">0.785398</td>
+                                    <td class="border-r border-slate-800 px-4 text-slate-500">=RADIANS(B3)</td>
+                                    <td class="px-4 text-slate-500 italic">Sinus/Kosinus üçün vacib radian çevrilməsi</td>
+                                </tr>
+                                <tr class="bg-slate-900/40">
+                                    <td class="bg-slate-900 text-slate-500 text-center border-r border-slate-800 py-2.5">5</td>
+                                    <td colspan="3" class="border-r border-slate-800 px-4 font-bold text-slate-500 uppercase tracking-widest text-center">Fırlanma Başlanğıcı (Mərkəz)</td>
+                                    <td class="px-4 text-slate-500 italic">Fırlanmada rəqəm xətalarını aradan qaldırır</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-slate-900 text-slate-500 text-center border-r border-slate-800 py-2.5">6</td>
+                                    <td class="border-r border-slate-800 px-4 text-slate-400">Minimum X (X0):</td>
+                                    <td class="border-r border-slate-800 px-4 text-emerald-400">385410</td>
+                                    <td class="border-r border-slate-800 px-4 text-slate-500">=MIN(B10:B13)</td>
+                                    <td class="px-4 text-slate-500 italic">Daxil etdiyiniz künc X-lərinin minimumu</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-slate-900 text-slate-500 text-center border-r border-slate-800 py-2.5">7</td>
+                                    <td class="border-r border-slate-800 px-4 text-slate-400">Minimum Y (Y0):</td>
+                                    <td class="border-r border-slate-800 px-4 text-emerald-400">4467320</td>
+                                    <td class="border-r border-slate-800 px-4 text-slate-500">=MIN(C10:C13)</td>
+                                    <td class="px-4 text-slate-500 italic">Daxil etdiyiniz künc Y-lərinin minimumu</td>
+                                </tr>
+                                <tr class="bg-slate-900/40">
+                                    <td class="bg-slate-900 text-slate-500 text-center border-r border-slate-800 py-2.5">9</td>
+                                    <td class="border-r border-slate-800 px-4 font-bold text-slate-400">Künc №</td>
+                                    <td class="border-r border-slate-800 px-4 font-bold text-emerald-400">Həqiqi X</td>
+                                    <td class="border-r border-slate-800 px-4 font-bold text-emerald-400">Həqiqi Y</td>
+                                    <td class="px-4 font-bold text-indigo-400">Excel Fırlatma Formulları (X' və Y')</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-slate-900 text-slate-500 text-center border-r border-slate-800 py-2.5">10</td>
+                                    <td class="border-r border-slate-800 px-4 text-slate-400">Künc 1</td>
+                                    <td class="border-r border-slate-800 px-4 text-white">385410</td>
+                                    <td class="border-r border-slate-800 px-4 text-white">4467320</td>
+                                    <td class="px-4 text-amber-400 font-bold">
+                                        X' üçün (D10 xanası): <span class="text-slate-300 font-normal">=(B10-$B$6)*COS($B$4)+(C10-$B$7)*SIN($B$4)</span><br>
+                                        Y' üçün (E10 xanası): <span class="text-slate-300 font-normal">=-(B10-$B$6)*SIN($B$4)+(C10-$B$7)*COS($B$4)</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Riyazi və vizualizasiya skriptləri -->
+    <script>
+        // Standart sahə nümunəsi (Azərbaycan - Gədəbəy regionu koordinatları)
+        const SAMPLE_CORNERS = [
+            { x: 570100, y: 4500100 },
+            { x: 570500, y: 4500100 },
+            { x: 570500, y: 4500400 },
+            { x: 570100, y: 4500400 }
+        ];
+
+        let corners = [...SAMPLE_CORNERS];
+        let calculatedPoints = [];
+
+        function switchTab(tabName) {
+            const tabs = ['calculator', 'guide'];
+            tabs.forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).className = "px-5 py-2.5 rounded-lg font-medium text-sm transition-all bg-slate-800 text-slate-300 hover:bg-slate-700";
+            });
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tabName}`).className = "px-5 py-2.5 rounded-lg font-medium text-sm transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/20";
+            
+            if (tabName === 'calculator') {
+                setTimeout(drawVisualization, 50);
+            }
+        }
+
+        function updateUTMLabels() {
+            const zone = document.getElementById('utm-zone').value || '38';
+            const hemi = document.getElementById('utm-hemisphere').value || 'N';
+            const utmStr = `UTM${zone}${hemi}`;
+
+            document.title = `${utmStr} Geofiziki Profil Kalkulyatoru`;
+            document.querySelectorAll('.utm-label').forEach(el => {
+                el.innerText = utmStr;
+            });
+
+            calculateProfiles();
+        }
+
+        function init() {
+            updateCornerInputs();
+            updateUTMLabels();
+            window.addEventListener('resize', drawVisualization);
+        }
+
+        function updateAzimuthVal(val) {
+            document.getElementById('azimuth-val').innerText = val + '°';
+            calculateProfiles();
+        }
+
+        function updateCornerInputs() {
+            const count = parseInt(document.getElementById('corner-count').value) || 4;
+            const container = document.getElementById('corners-container');
+            container.innerHTML = '';
+
+            if (corners.length < count) {
+                const last = corners[corners.length - 1] || { x: 385400, y: 4467300 };
+                while (corners.length < count) {
+                    corners.push({ x: last.x + 100, y: last.y + 100 });
+                }
+            } else if (corners.length > count) {
+                corners = corners.slice(0, count);
+            }
+
+            for (let i = 0; i < count; i++) {
+                const row = document.createElement('div');
+                row.className = "grid grid-cols-12 gap-2 items-center bg-slate-950/40 border border-slate-850 p-2.5 rounded-lg";
+                row.innerHTML = `
+                    <div class="col-span-2 text-xs font-bold text-slate-500 text-center">#${i + 1}</div>
+                    <div class="col-span-5">
+                        <input type="number" value="${Math.round(corners[i].x)}" oninput="updateCornerCoord(${i}, 'x', this.value)" placeholder="X (Şərq)" class="w-full bg-slate-900 text-xs border border-slate-800 rounded px-2 py-1.5 text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="col-span-5">
+                        <input type="number" value="${Math.round(corners[i].y)}" oninput="updateCornerCoord(${i}, 'y', this.value)" placeholder="Y (Şimal)" class="w-full bg-slate-900 text-xs border border-slate-800 rounded px-2 py-1.5 text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                `;
+                container.appendChild(row);
+            }
+            calculateProfiles();
+        }
+
+        function updateCornerCoord(index, coordinate, value) {
+            corners[index][coordinate] = parseFloat(value) || 0;
+            calculateProfiles();
+        }
+
+        function loadSampleCoordinates() {
+            document.getElementById('corner-count').value = 4;
+            corners = JSON.parse(JSON.stringify(SAMPLE_CORNERS));
+            updateCornerInputs();
+        }
+
+        // Ray-Casting Alqoritmi (Poliqon daxilini yoxlamaq üçün)
+        function isPointInPolygon(point, polygon) {
+            const x = point.x, y = point.y;
+            let inside = false;
+            for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+                const xi = polygon[i].x, yi = polygon[i].y;
+                const xj = polygon[j].x, yj = polygon[j].y;
+                
+                const intersect = ((yi > y) !== (yj > y))
+                    && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+            return inside;
+        }
+
+        // Geofiziki Profil Torunun Hesablanması
+        function calculateProfiles() {
+            const pointSpacing = parseFloat(document.getElementById('point-spacing').value) || 5;
+            const profileSpacing = parseFloat(document.getElementById('profile-spacing').value) || 20;
+            const azimuthDeg = parseFloat(document.getElementById('azimuth').value) || 0;
+            
+            if (corners.length < 3) return;
+
+            // Azimutu dərəcədən radiana çevirək
+            const theta = azimuthDeg * Math.PI / 180;
+
+            const xCoords = corners.map(c => c.x);
+            const yCoords = corners.map(c => c.y);
+            const x0 = Math.min(...xCoords);
+            const y0 = Math.min(...yCoords);
+
+            // Düz fırlatma funksiyası
+            function rotateForward(pt) {
+                const dx = pt.x - x0;
+                const dy = pt.y - y0;
+                const xPrime = dx * Math.sin(theta) + dy * Math.cos(theta);
+                const yPrime = dx * Math.cos(theta) - dy * Math.sin(theta);
+                return { x: xPrime, y: yPrime };
+            }
+
+            // Geri fırlatma funksiyası
+            function rotateInverse(ptPrime) {
+                const dx = ptPrime.x * Math.sin(theta) + ptPrime.y * Math.cos(theta);
+                const dy = ptPrime.x * Math.cos(theta) - ptPrime.y * Math.sin(theta);
+                return { x: x0 + dx, y: y0 + dy };
+            }
+
+            const localCorners = corners.map(pt => rotateForward(pt));
+            
+            const localXCoords = localCorners.map(c => c.x);
+            const localYCoords = localCorners.map(c => c.y);
+            
+            const minLocalX = Math.min(...localXCoords);
+            const maxLocalX = Math.max(...localXCoords);
+            const minLocalY = Math.min(...localYCoords);
+            const maxLocalY = Math.max(...localYCoords);
+
+            calculatedPoints = [];
+            let globalPointIndex = 1;
+            let currentProfileNum = 1;
+
+            for (let localY = minLocalY; localY <= maxLocalY; localY += profileSpacing) {
+                let piketNum = 1;
+                let profileHasPoints = false;
+                
+                for (let localX = minLocalX; localX <= maxLocalX; localX += pointSpacing) {
+                    const localPt = { x: localX, y: localY };
+                    const globalPt = rotateInverse(localPt);
+
+                    if (isPointInPolygon(globalPt, corners)) {
+                        calculatedPoints.push({
+                            id: globalPointIndex++,
+                            profile: currentProfileNum,
+                            piket: piketNum++,
+                            localX: localX,
+                            localY: localY,
+                            globalX: globalPt.x,
+                            globalY: globalPt.y
+                        });
+                        profileHasPoints = true;
+                    }
+                }
+                if (profileHasPoints) {
+                    currentProfileNum++;
+                }
+            }
+
+            updateTableUI();
+            drawVisualization();
+        }
+
+        function updateTableUI() {
+            const tbody = document.getElementById('results-tbody');
+            document.getElementById('piket-counter').innerText = `Cəmi: ${calculatedPoints.length} nöqtə`;
+
+            if (calculatedPoints.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-10 text-center text-slate-500"><i class="fa-solid fa-triangle-exclamation mr-2 text-amber-500"></i> Sahə daxilinə düşən nöqtə tapılmadı. Addımları azaldın.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            const displayPoints = calculatedPoints.slice(0, 15);
+            
+            displayPoints.forEach(pt => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-900/40 transition-all";
+                tr.innerHTML = `
+                    <td class="px-6 py-3 font-semibold text-slate-500">${pt.id}</td>
+                    <td class="px-6 py-3 font-bold text-indigo-400">P-${pt.profile}</td>
+                    <td class="px-6 py-3 text-slate-200">PK-${pt.piket}</td>
+                    <td class="px-6 py-3 text-xs code-font text-slate-400">${pt.localX.toFixed(2)}</td>
+                    <td class="px-6 py-3 text-xs code-font text-slate-400">${pt.localY.toFixed(2)}</td>
+                    <td class="px-6 py-3 text-xs code-font text-white font-medium">${pt.globalX.toFixed(3)}</td>
+                    <td class="px-6 py-3 text-xs code-font text-white font-medium">${pt.globalY.toFixed(3)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if (calculatedPoints.length > 15) {
+                const tr = document.createElement('tr');
+                tr.className = "bg-slate-900/20";
+                tr.innerHTML = `
+                    <td colspan="7" class="px-6 py-3 text-center text-xs text-slate-500 italic">
+                        ... və əlavə olaraq daha ${calculatedPoints.length - 15} nöqtə var. Bütün siyahını yükləmək üçün Excel düyməsinə klikləyin.
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            }
+        }
+
+        function drawVisualization() {
+            const canvas = document.getElementById('visualizer-canvas');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * 2;
+            canvas.height = rect.height * 2;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (corners.length < 3) return;
+
+            const xCoords = corners.map(c => c.x);
+            const yCoords = corners.map(c => c.y);
+            const minX = Math.min(...xCoords);
+            const maxX = Math.max(...xCoords);
+            const minY = Math.min(...yCoords);
+            const maxY = Math.max(...yCoords);
+
+            const dx = maxX - minX;
+            const dy = maxY - minY;
+            const maxRange = Math.max(dx, dy) || 1;
+
+            const padding = 100;
+            const scale = Math.min(canvas.width - padding * 2, canvas.height - padding * 2) / maxRange;
+
+            function toCanvasCoord(globalPt) {
+                const cx = padding + (globalPt.x - minX) * scale + (canvas.width - padding * 2 - dx * scale) / 2;
+                const cy = canvas.height - (padding + (globalPt.y - minY) * scale + (canvas.height - padding * 2 - dy * scale) / 2);
+                return { x: cx, y: cy };
+            }
+
+            // Arxa fon şəbəkəsi
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            const gridSpacing = 50;
+            for (let i = 0; i < canvas.width; i += gridSpacing) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+            }
+            for (let j = 0; j < canvas.height; j += gridSpacing) {
+                ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(canvas.width, j); ctx.stroke();
+            }
+
+            // Poliqon sərhədləri
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 4;
+            ctx.lineJoin = 'round';
+            ctx.fillStyle = 'rgba(16, 185, 129, 0.05)';
+
+            ctx.beginPath();
+            corners.forEach((pt, i) => {
+                const canvasPt = toCanvasCoord(pt);
+                if (i === 0) ctx.moveTo(canvasPt.x, canvasPt.y);
+                else ctx.lineTo(canvasPt.x, canvasPt.y);
+            });
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Künc nöqtələri
+            corners.forEach((pt, i) => {
+                const canvasPt = toCanvasCoord(pt);
+                ctx.fillStyle = '#059669';
+                ctx.beginPath();
+                ctx.arc(canvasPt.x, canvasPt.y, 8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = 'bold 20px "Plus Jakarta Sans"';
+                ctx.fillText(`K${i+1}`, canvasPt.x + 12, canvasPt.y - 12);
+            });
+
+            // Piketlər
+            calculatedPoints.forEach(pt => {
+                const canvasPt = toCanvasCoord({ x: pt.globalX, y: pt.globalY });
+                const hue = (pt.profile * 45) % 360;
+                ctx.fillStyle = `hsla(${hue}, 75%, 60%, 0.85)`;
+                ctx.beginPath();
+                ctx.arc(canvasPt.x, canvasPt.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function exportCSV() {
+            if (calculatedPoints.length === 0) {
+                alert("Yükləmək üçün nöqtə tapılmadı!");
+                return;
+            }
+
+            const zone = document.getElementById('utm-zone').value || '38';
+            const hemi = document.getElementById('utm-hemisphere').value || 'N';
+            const utmStr = `UTM${zone}${hemi}`;
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += `Sira_No,Profil_No,Piket_No,Local_X_Prime,Local_Y_Prime,${utmStr}_X,${utmStr}_Y\n`;
+
+            calculatedPoints.forEach(pt => {
+                const row = `${pt.id},P-${pt.profile},PK-${pt.piket},${pt.localX.toFixed(2)},${pt.localY.toFixed(2)},${pt.globalX.toFixed(3)},${pt.globalY.toFixed(3)}`;
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `geofiziki_profiller_${utmStr.toLowerCase()}_azimuth_${document.getElementById('azimuth').value}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // UTM -> Lat/Lon dönüşümü (WGS84 Standart Elipsoid Alqoritmi)
+        function utmToLatLng(zone, easting, northing, northernHemisphere = true) {
+            const k0 = 0.9996;
+            const a = 6378137; // WGS84 major radius
+            const f = 1 / 298.257223563; // WGS84 flattening
+            const b = a * (1 - f); // WGS84 minor radius
+            const e = Math.sqrt(1 - (b * b) / (a * a)); // first eccentricity
+            const ePrimeSquared = (e * e) / (1 - e * e); // second eccentricity squared
+            
+            const x = easting - 500000;
+            const y = northernHemisphere ? northing : northing - 10000000;
+            
+            const lambda0 = ((zone - 1) * 6 - 180 + 3) * Math.PI / 180; // central meridian in radians
+            
+            const M = y / k0;
+            const mu = M / (a * (1 - e*e/4 - 3*e*e*e*e/64 - 5*e*e*e*e*e*e/256));
+            
+            const e1 = (1 - Math.sqrt(1 - e*e)) / (1 + Math.sqrt(1 - e*e));
+            
+            const J1 = (3 * e1 / 2 - 27 * e1*e1*e1 / 32);
+            const J2 = (21 * e1*e1 / 16 - 55 * e1*e1*e1*e1 / 32);
+            const J3 = (151 * e1*e1*e1 / 96);
+            const J4 = (1097 * e1*e1*e1*e1 / 512);
+            
+            const fp = mu + J1 * Math.sin(2 * mu) + J2 * Math.sin(4 * mu) + J3 * Math.sin(6 * mu) + J4 * Math.sin(8 * mu);
+            
+            const C1 = ePrimeSquared * Math.cos(fp) * Math.cos(fp);
+            const T1 = Math.tan(fp) * Math.tan(fp);
+            const R1 = a * (1 - e*e) / Math.pow(1 - e*e * Math.sin(fp) * Math.sin(fp), 1.5);
+            const N1 = a / Math.sqrt(1 - e*e * Math.sin(fp) * Math.sin(fp));
+            const D = x / (N1 * k0);
+            
+            const Q1 = D*D/2;
+            const Q2 = (5 + 3*T1 + 10*C1 - 4*C1*C1 - 9*ePrimeSquared) * D*D*D*D / 24;
+            const Q3 = (61 + 90*T1 + 298*C1 + 45*T1*T1 - 3*C1*C1 - 252*ePrimeSquared) * Math.pow(D, 6) / 720;
+            let lat = fp - (N1 * Math.tan(fp) / R1) * (Q1 - Q2 + Q3);
+            
+            const L1 = D;
+            const L2 = (1 + 2*T1 + C1) * D*D*D / 6;
+            const L3 = (5 - 2*C1 + 28*T1 - 3*C1*C1 + 8*ePrimeSquared + 24*T1*T1) * Math.pow(D, 5) / 120;
+            let lon = lambda0 + (L1 - L2 + L3) / Math.cos(fp);
+            
+            return {
+                lat: lat * 180 / Math.PI,
+                lon: lon * 180 / Math.PI
+            };
+        }
+
+        function exportKML() {
+            if (calculatedPoints.length === 0) {
+                alert("Yükləmək üçün nöqtə tapılmadı!");
+                return;
+            }
+
+            const zone = parseInt(document.getElementById('utm-zone').value) || 38;
+            const hemi = document.getElementById('utm-hemisphere').value || 'N';
+            const northernHemisphere = (hemi === 'N');
+            const azimuth = document.getElementById('azimuth').value;
+
+            const boundaryCoords = corners.map(pt => {
+                const ll = utmToLatLng(zone, pt.x, pt.y, northernHemisphere);
+                return `${ll.lon.toFixed(7)},${ll.lat.toFixed(7)},0`;
+            });
+            if (boundaryCoords.length > 0) {
+                boundaryCoords.push(boundaryCoords[0]);
+            }
+
+            const profiles = {};
+            calculatedPoints.forEach(pt => {
+                if (!profiles[pt.profile]) {
+                    profiles[pt.profile] = [];
+                }
+                profiles[pt.profile].push(pt);
+            });
+
+            let kml = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Geofiziki Profil ve Piketler (UTM${zone}${hemi})</name>
+    <description>Azimut: ${azimuth}° | Piket addımı: ${document.getElementById('point-spacing').value}m | Profil məsafəsi: ${document.getElementById('profile-spacing').value}m</description>
+    
+    <Style id="boundaryStyle">
+      <LineStyle>
+        <color>ff00b910</color>
+        <width>3</width>
+      </LineStyle>
+      <PolyStyle>
+        <color>2000b910</color>
+      </PolyStyle>
+    </Style>
+    
+    <Style id="piketStyle">
+      <IconStyle>
+        <color>ff4f93ff</color>
+        <scale>0.6</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href>
+        </Icon>
+      </IconStyle>
+    </Style>
+
+    <Folder>
+      <name>Sahə Sərhədi (Poliqon)</name>
+      <Placemark>
+        <name>Geofiziki Poliqon</name>
+        <styleUrl>#boundaryStyle</styleUrl>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                ${boundaryCoords.join('\n                ')}
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+    </Folder>
+`;
+
+            Object.keys(profiles).forEach(profNum => {
+                kml += `    <Folder>\n      <name>Profil ${profNum}</name>\n`;
+                profiles[profNum].forEach(pt => {
+                    const ll = utmToLatLng(zone, pt.globalX, pt.globalY, northernHemisphere);
+                    kml += `      <Placemark>
+        <name>P${pt.profile}-PK${pt.piket}</name>
+        <description>X: ${pt.globalX.toFixed(3)}\nY: ${pt.globalY.toFixed(3)}\nFırladılmış X': ${pt.localX.toFixed(2)}\nFırladılmış Y': ${pt.localY.toFixed(2)}</description>
+        <styleUrl>#piketStyle</styleUrl>
+        <Point>
+          <coordinates>${ll.lon.toFixed(7)},${ll.lat.toFixed(7)},0</coordinates>
+        </Point>
+      </Placemark>\n`;
+                });
+                kml += `    </Folder>\n`;
+            });
+
+            kml += `  </Document>\n</kml>`;
+
+            const blob = new Blob([kml], { type: 'application/vnd.google-earth.kml+xml' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `geofiziki_profiller_utm${zone}${hemi.toLowerCase()}_azimuth_${azimuth}.kml`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
